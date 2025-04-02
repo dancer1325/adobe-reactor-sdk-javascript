@@ -10,87 +10,76 @@ https://badge.fury.io/js/%40adobe%2Freactor-sdk)
 https://badges.greenkeeper.io/adobe/reactor-sdk-javascript.svg)](
 https://account.greenkeeper.io/account/adobe#repositories)
 
-A Library for accessing the Adobe Experience Platform
-[Reactor API][Reactor API doc].
+* == Library /
+  * ⭐️enable accessing the Adobe Experience Platform [Reactor API][Reactor API doc]⭐️
+    * 1to1 -- with -- RESTful API endpoints /
+      * NO help -- to construct -- your payloads
+        * Reason: 🧠meet the expectations of JavaScript developers 🧠
+  * low-level API
 
-This API is fairly low-level.  The Reactor methods are one-to-one with the
-RESTful API endpoints, and they provide very little help in constructing your
-payloads.  This is intended to meet the expectations of JavaScript developers,
-but we welcome your feedback.
+## How to install?
+### -- via -- npm
+*
+  ```bash
+  npm install @adobe/reactor-sdk
+  ```
+* if you want to bundle it -> use a bundler
+  * [Webpack](https://webpack.github.io/),
+  * [Rollup](https://rollupjs.org),
+  * [Parcel](https://parceljs.org/)
 
-## Installation
+### -- via -- CDN
 
-### Using npm
+* == -- via -- UMD distribution | CDN's `dist/`
+  * add the script
+    ```html
+    <script src="https://unpkg.com/@adobe/reactor-sdk/dist/reactor-sdk.min.js"></script>
+    ```
+  * Reactor constructor -- is installed as -- `window.Reactor`
+    * see
+      * [How to retrieve your Access Token](#your-access-token)
+      * [How to retrieve your Org ID](#your-org-id)
+    * _Example:_
+    ```html
+    <script src="https://unpkg.com/@adobe/reactor-sdk/dist/reactor-sdk.min.js"></script>
+    <script>
+      const tok = 'Your Access Token';
+      const orgId = 'Your Org Id';
+      const url = 'https://reactor.adobe.io';
+      const reactor = new window.Reactor(tok, {
+        reactorUrl: url,
+        customHeaders: {'x-gw-ims-org-id': orgId}
+      });
+      const acme = await reactor.getCompany('CO0123456789012345678901');
+      ...
+    </script>
+    ```
 
-You can use the Reactor SDK from npm with a bundler like
-[Webpack](https://webpack.github.io/), [Rollup](https://rollupjs.org), or
-[Parcel](https://parceljs.org/). If you use npm for client package management,
-you can install the SDK with:
+## How to use?
 
-```bash
-npm install @adobe/reactor-sdk
-```
+* _Example:_ nodejs script / lists the ID's & names your Company's properties
+  ```javascript, title="list-properties.js"
+  #!/usr/bin/env node
+  const Reactor = require('@adobe/reactor-sdk').default;
 
-### Using a CDN
-
-If you'd prefer not to use npm to manage your client packages, reactor-sdk
-also provides a UMD distribution in a `dist` folder which is hosted on a CDN:
-
-```html
-<script src="https://unpkg.com/@adobe/reactor-sdk/dist/reactor-sdk.min.js"></script>
-```
-
-The Reactor constructor will be installed as `window.Reactor`, so typical usage
-would go something like this:
-
-```html
-<script src="https://unpkg.com/@adobe/reactor-sdk/dist/reactor-sdk.min.js"></script>
-<script>
-  const tok = 'Your Access Token';
-  const orgId = 'Your Org Id';
-  const url = 'https://reactor.adobe.io';
-  const reactor = new window.Reactor(tok, {
-    reactorUrl: url,
-    customHeaders: {'x-gw-ims-org-id': orgId}
-  });
-  const acme = await reactor.getCompany('CO0123456789012345678901');
-  ...
-</script>
-```
-
-[How to retrieve your Access Token](#your-access-token).
-
-[How to retrieve your Org ID](#your-org-id).
-
-## Usage
-
-The example below is a nodejs script that lists the ID's and names of all your
-Company's properties.
-
-Put this text in a file named `list-properties.js`:
-
-```javascript
-#!/usr/bin/env node
-const Reactor = require('@adobe/reactor-sdk').default;
-
-(async function() {
-  const accessToken = process.env['ACCESS_TOKEN'];
-  const orgId = process.env['ORG_ID'];
-  const reactorUrl = 'https://reactor.adobe.io';
-  const reactor = new Reactor(accessToken, { reactorUrl: reactorUrl, customHeaders: {'x-gw-ims-org-id': orgId} });
-  // Example API call: list Companies for the authenticated organization
-  const companyList = await reactor.listCompanies();
-  for (var company of companyList.data) {
-    console.log(`${company.id} ${company.attributes.name}`);
-    // Example API call: list Properties for the identified Company
-    const list = await reactor.listPropertiesForCompany(company.id);
-    for (var property of list.data) {
-      console.log(`- ${property.id} ${property.attributes.name}`);
+  (async function() {
+    const accessToken = process.env['ACCESS_TOKEN'];
+    const orgId = process.env['ORG_ID'];
+    const reactorUrl = 'https://reactor.adobe.io';
+    const reactor = new Reactor(accessToken, { reactorUrl: reactorUrl, customHeaders: {'x-gw-ims-org-id': orgId} });
+    // Example API call: list Companies for the authenticated organization
+    const companyList = await reactor.listCompanies();
+    for (var company of companyList.data) {
+      console.log(`${company.id} ${company.attributes.name}`);
+      // Example API call: list Properties for the identified Company
+      const list = await reactor.listPropertiesForCompany(company.id);
+      for (var property of list.data) {
+        console.log(`- ${property.id} ${property.attributes.name}`);
+      }
     }
-  }
-})();
-```
-
+  })();
+  ```
+* TODO:
 **Note:** If you are provisioned for multiple orgs, you will need to specify your org ID under `customHeaders` as shown below.
 
 You can optionally add other custom headers that will be sent with each request by also
@@ -311,12 +300,12 @@ const Reactor = require('@adobe/reactor-sdk').default;
 
 ### Your Company ID
 
-* Log in to `https://launch.adobe.com/companies`
-* While looking at your Properties page, the address bar will show a URL like
-  `https://launch.adobe.com/companies/CO81f8cb0aca3a4ab8927ee1798c0d4f8a/properties`.
-* Your Company ID is the 'CO' followed by 32 hexadecimal digits (i.e., from "CO"
-  up to the following slash). Copy that company ID to an environment variable:
-  * `export COMPANY_ID=CO81f8cb0aca3a4ab8927ee1798c0d4f8a`
+* log in `https://launch.adobe.com/companies`
+* | your Properties page,
+  * _Example of address bar:_ `https://launch.adobe.com/companies/CO81f8cb0aca3a4ab8927ee1798c0d4f8a/properties`
+* 👀'CO' + 32 hexadecimal digits 👀
+  * syntax
+  * _Example:_ COMPANY_ID=CO81f8cb0aca3a4ab8927ee1798c0d4f8a`
 
 ### Your Org ID
 
